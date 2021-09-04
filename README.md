@@ -1,4 +1,4 @@
-# pywinauto自动脚本
+# pymol插件脚本
 
 
 
