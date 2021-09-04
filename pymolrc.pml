@@ -1,0 +1,1 @@
+run pymol_plugin.py
