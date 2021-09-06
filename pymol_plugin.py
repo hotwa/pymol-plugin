@@ -39,6 +39,7 @@ def autoshow(i,path=path,distance = 6):
     Returns:
         [list] -- [返回ligid标识符，除去了部分离子]
     """
+    cmd.reinitialize()
     p = Path(path)
     file = p.joinpath(f"{i}.pdb")
     cmd.load(file,i)
@@ -46,10 +47,12 @@ def autoshow(i,path=path,distance = 6):
     mole = moleculeidentity(f"{i}",path)
     rawstring = 'resn ' + ' resn '.join(mole.ligIdNoion)
     print(f'{rawstring} around 6')
-    cmd.select('ligand',f'{rawstring} around 6') # 选择一个在当前pdb对象中配体残基周围距离为6A的口袋对象
+    cmd.select('ligand',f'{rawstring}')
+    cmd.select('ligand_around',f'{rawstring} around 6') # 选择一个在当前pdb对象中配体残基周围距离为6A的口袋对象
+    cmd.create('ligand_part',f'{rawstring} expand 6') # 单独显示小分子扩展6A周围的lines对象
     # cmd.create('pocket',f'byres {i} within {distance} of {rawstring}') # 创建一个在当前pdb对象中配体残基周围距离为6A的口袋对象
-    # cmd.show('lines','ligand ') # 在distance距离内显示侧链 #! 在pymol中执行该条命令显示的lines不全，所以改手动。show lines
-    # cmd.reinitialize()
+    cmd.show('lines','ligand_around ') # 显示侧链 #! 在pymol中执行该条命令显示的lines不全，所以改手动。show lines
+    cmd.show('lines','ligand_aroundobj ')
     return mole.ligIdNoion
 
 # error class
