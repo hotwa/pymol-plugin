@@ -45,9 +45,10 @@ def autoshow(i,path=path,distance = 6):
     cmd.remove('solvent')
     mole = moleculeidentity(f"{i}",path)
     rawstring = 'resn ' + ' resn '.join(mole.ligIdNoion)
+    print(f'{rawstring} around 6')
     cmd.select('ligand',f'{rawstring} around 6') # 选择一个在当前pdb对象中配体残基周围距离为6A的口袋对象
     # cmd.create('pocket',f'byres {i} within {distance} of {rawstring}') # 创建一个在当前pdb对象中配体残基周围距离为6A的口袋对象
-    cmd.show('lines','ligand ') # 在distance距离内显示侧链
+    # cmd.show('lines','ligand ') # 在distance距离内显示侧链 #! 在pymol中执行该条命令显示的lines不全，所以改手动。show lines
     # cmd.reinitialize()
     return mole.ligIdNoion
 
