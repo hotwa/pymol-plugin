@@ -24,10 +24,10 @@ path = 'H:\\CovInDB\\code\\CovInDB\\crawler\\2021\\pdbfile'
 
 # select ligand, resn x
 # cmd.select('ligand','byres 5UEH within 6 of resn GOL resn 85P')
-def autoshow(i,path=path,distance = 6):
+def autoshow(i,path=path,distance = 6,ionshow = False):
     """autoshow 自动展示所有配体6A以内的lines，方便查找共价键
 
-    [extended_summary]
+    [extended_summary] # cmd.create('pocket',f'byres {i} within {distance} of {rawstring}') # 创建一个在当前pdb对象中配体残基周围距离为6A的口袋对象
 
     Arguments:
         i {[string]} -- [pdbid 例如 5EA9]
@@ -35,6 +35,7 @@ def autoshow(i,path=path,distance = 6):
     Keyword Arguments:
         path {[string]} -- [pdb文件存放的目录，目前支持后缀为.pdb的文件，也可以在全局变量中设置好文件目录] (default: {path})
         distance {[int]} -- [显示周围原子的距离参数] (default: {6})
+        ionshow {[bool]} -- [离子和有机小分子周围共价结合观察使用，默认不展示] (default: {False})
 
     Returns:
         [list] -- [返回ligid标识符，除去了部分离子]
@@ -43,16 +44,18 @@ def autoshow(i,path=path,distance = 6):
     p = Path(path)
     file = p.joinpath(f"{i}.pdb")
     cmd.load(file,i)
-    cmd.remove('solvent')
+    cmd.remove('solvent metals') # 移除金属离子和溶剂
     mole = moleculeidentity(f"{i}",path)
     rawstring = 'resn ' + ' resn '.join(mole.ligIdNoion)
     print(f'{rawstring} around 6')
     cmd.select('ligand',f'{rawstring}')
     cmd.select('ligand_around',f'{rawstring} around 6') # 选择一个在当前pdb对象中配体残基周围距离为6A的口袋对象
-    cmd.create('ligand_part',f'{rawstring} expand 6') # 单独显示小分子扩展6A周围的lines对象
-    # cmd.create('pocket',f'byres {i} within {distance} of {rawstring}') # 创建一个在当前pdb对象中配体残基周围距离为6A的口袋对象
-    cmd.show('lines','ligand_part ') # 显示侧链 #! 在pymol中执行该条命令显示的lines不全，所以改手动。show lines
-    return mole.ligIdNoion
+    if ionshow: # 是否显示所有记录小分子HET条记录中的信息，对于离子与有机物显示相关共价键有效
+        cmd.show('lines','ligand_part') # 显示所有HET侧链
+        cmd.create('ligand_part',f'{rawstring} expand 6') # 单独显示小分子扩展6A周围的lines对象
+    cmd.create('organ','organic expand 6')
+    cmd.show('lines','organ')
+    return mole.ligId
 
 # error class
 class PathError(BaseException):
